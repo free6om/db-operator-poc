@@ -1,8 +1,8 @@
 # db-operator-poc
-// TODO(user): Add simple overview of use/purpose
+PoC: Build a PG operator on KubeBlocks.
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+Build a PG operator by translate CNPG Cluster API to KubeBlocks Cluster API with PG Add-on.
 
 ## Getting Started
 
@@ -39,10 +39,20 @@ make deploy IMG=<some-registry>/db-operator-poc:tag
 privileges or be logged in as admin.
 
 **Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+Copy sample from [CNPG doc](https://cloudnative-pg.io/documentation/1.23/samples/cluster-example.yaml), update apiVersion and kind:
+```yaml
+apiVersion: apps.pg.dboperator.io/v1alpha1
+kind: PGCluster
+metadata:
+  name: db-operator-poc
+spec:
+  instances: 3
+  storage:
+    size: 1Gi
+```
 
 ```sh
-kubectl apply -k config/samples/
+kubectl apply -f cluster-example.yaml
 ```
 
 >**NOTE**: Ensure that the samples has default values to test it out.

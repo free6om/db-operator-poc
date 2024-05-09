@@ -19,7 +19,9 @@ package controller
 import (
 	"context"
 
+	"github.com/apecloud/kubeblocks/pkg/controller/kubebuilderx"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -31,11 +33,14 @@ import (
 type PGClusterReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=apps.pg.dboperator.io,resources=pgclusters,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps.pg.dboperator.io,resources=pgclusters/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=apps.pg.dboperator.io,resources=pgclusters/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=apps.kubeblocks.io,resources=clusters,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -47,11 +52,14 @@ type PGClusterReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *PGClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx).WithName("pg-cluster")
 
-	// TODO(user): your logic here
+	err := kubebuilderx.NewController(ctx, r.Client, req, r.EventRecorder, logger).
+		Prepare(objectTree()).
+		Do(translateToKubeBlocksCluster()).
+		Commit()
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{}, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
