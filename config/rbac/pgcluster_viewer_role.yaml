@@ -1,0 +1,27 @@
+# permissions for end users to view pgclusters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: pgcluster-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: db-operator-poc
+    app.kubernetes.io/part-of: db-operator-poc
+    app.kubernetes.io/managed-by: kustomize
+  name: pgcluster-viewer-role
+rules:
+- apiGroups:
+  - apps.pg.dboperator.io
+  resources:
+  - pgclusters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps.pg.dboperator.io
+  resources:
+  - pgclusters/status
+  verbs:
+  - get
